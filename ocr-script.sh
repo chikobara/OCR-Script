@@ -7,13 +7,12 @@ TMPDIR=$(mktemp -d)
 gnome-screenshot -a -f $TMPDIR/screenshot.png
 
 # Process the screenshot with Tesseract and save the result to a text file in the temporary directory
-tesseract $TMPDIR/screenshot.png $TMPDIR/output
+tesseract -l eng+jpn+ara $TMPDIR/screenshot.png $TMPDIR/output 
 
-# Copy the result to the clipboard
-# ignore all non-ASCII characters
-cat $TMPDIR/output.txt |
-    tr -cd '\11\12\15\40-\176' | grep . | perl -pe 'chomp if eof' |
-    xclip -selection clipboard
+# Copy the result to the clipboard, preserving Unicode characters
+cat $TMPDIR/output.txt | xclip -selection clipboard -in -target UTF8_STRING
+
+echo "Text copied to clipboard. Temporary file: $TMPDIR/output.txt"
 
 # Optionally, remove the temporary directory when done
 rm -r $TMPDIR
